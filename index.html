@@ -1,0 +1,775 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>두통 체크</title>
+<meta name="description" content="증상과 병력을 입력하면 응급 위험 신호를 먼저 확인하고, 가능성이 높은 두통 유형과 병원·검사·관리 방법을 안내하는 참고용 도구입니다.">
+<style>
+:root{--bg:#f5f6fc;--card:#ffffff;--ink:#1b2140;--mute:#5f678a;--line:#e5e8f4;--line2:#ccd1e8;--accent:#4a5ee6;--accent2:#6f80f8;--accent-ink:#ffffff;--red:#b3261e;--redbg:#fdeceb;--amber:#8a5200;--amberbg:#fff3df;--blue:#3b4cc0;--bluebg:#eceffe;--green:#1f7a4d;--greenbg:#e5f5ec;--r:18px;--shadow:0 1px 2px rgba(40,50,110,.05),0 14px 30px -18px rgba(40,50,110,.24)}
+@media(prefers-color-scheme:dark){:root{--bg:#0f1224;--card:#181c33;--ink:#eceffd;--mute:#a2a9cb;--line:#272c4a;--line2:#3b4268;--accent:#8e9cff;--accent2:#7081f4;--accent-ink:#0b0f2e;--red:#ff8a80;--redbg:#3a1a1f;--amber:#ffc266;--amberbg:#392a12;--blue:#aab6ff;--bluebg:#1a2146;--green:#7fd4a0;--greenbg:#12301f;--shadow:0 1px 2px rgba(0,0,0,.3),0 14px 30px -18px rgba(0,0,0,.6)}}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{margin:0;color:var(--ink);font-family:"Pretendard Variable","Pretendard","Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",system-ui,sans-serif;line-height:1.65;font-size:16px;background:radial-gradient(900px 480px at 8% -8%,color-mix(in srgb,var(--accent) 14%,transparent),transparent 60%),radial-gradient(700px 420px at 100% 0,color-mix(in srgb,#ff9f7a 12%,transparent),transparent 55%),var(--bg);background-attachment:fixed;min-height:100vh}
+.top{position:sticky;top:0;z-index:5;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);background:color-mix(in srgb,var(--bg) 94%,transparent);border-bottom:1px solid color-mix(in srgb,var(--line) 70%,transparent)}
+.top-in{max-width:640px;margin:0 auto;padding:12px 18px;display:flex;align-items:center;justify-content:space-between}
+.brand{font-weight:800;letter-spacing:-.03em;font-size:18px;display:flex;align-items:center;gap:10px}
+.logo{width:30px;height:30px;border-radius:10px;background:linear-gradient(135deg,var(--accent2),var(--accent));display:grid;place-items:center;color:#fff;box-shadow:0 6px 14px -6px var(--accent)}
+.logo svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.link{background:none;border:1.5px solid var(--line2);color:var(--ink);font:inherit;font-size:14px;font-weight:700;cursor:pointer;padding:6px 14px;border-radius:99px;transition:.15s}
+.link:hover{border-color:var(--accent);color:var(--accent)}
+.card .link,.log .link{border:0;padding:4px 2px;color:var(--mute);font-size:13px}
+main{max-width:640px;margin:0 auto;padding:6px 18px 130px}
+main>*{animation:up .4s cubic-bezier(.2,.7,.2,1) both}
+main>*:nth-child(2){animation-delay:.04s}main>*:nth-child(3){animation-delay:.08s}main>*:nth-child(4){animation-delay:.12s}main>*:nth-child(n+5){animation-delay:.16s}
+@keyframes up{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){main>*{animation:none}html{scroll-behavior:auto}}
+.progress{height:6px;background:var(--line);border-radius:99px;overflow:hidden;margin:6px 0 20px}
+.progress i{display:block;height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent));border-radius:99px;transition:width .35s cubic-bezier(.2,.7,.2,1)}
+.stepno{color:var(--accent);font-size:13px;font-weight:800;letter-spacing:.04em}
+h1{font-size:27px;line-height:1.28;letter-spacing:-.035em;margin:6px 0 8px;font-weight:800}
+h2{font-size:18px;letter-spacing:-.02em;margin:0 0 8px;font-weight:800}
+.desc{color:var(--mute);margin:0 0 20px}
+fieldset{border:0;padding:0;margin:0 0 24px;min-width:0}
+legend{font-weight:800;margin-bottom:10px;padding:0;font-size:15px;letter-spacing:-.01em}
+.opt{position:relative;display:flex;gap:13px;align-items:flex-start;background:var(--card);border:1.5px solid var(--line);border-radius:16px;padding:14px 15px;margin-bottom:9px;cursor:pointer;transition:border-color .15s,background .15s,transform .15s,box-shadow .15s}
+.opt:hover{border-color:color-mix(in srgb,var(--accent) 50%,var(--line));transform:translateY(-1px);box-shadow:var(--shadow)}
+.opt input{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:pointer}
+.mark{flex:none;width:22px;height:22px;border:2px solid var(--line2);border-radius:50%;margin-top:2px;display:grid;place-items:center;transition:.15s;background:var(--card)}
+.opt input[type=checkbox]~.mark{border-radius:7px}
+.mark::after{content:"";width:10px;height:6px;border-left:2.5px solid var(--accent-ink);border-bottom:2.5px solid var(--accent-ink);transform:rotate(-45deg) translate(1px,-1px) scale(0);transition:transform .18s cubic-bezier(.3,1.6,.5,1)}
+.opt:has(input:checked){border-color:var(--accent);background:color-mix(in srgb,var(--accent) 8%,var(--card));box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 14%,transparent)}
+.opt:has(input:checked) .mark{background:var(--accent);border-color:var(--accent)}
+.opt:has(input:checked) .mark::after{transform:rotate(-45deg) translate(1px,-1px) scale(1)}
+.opt:has(input:focus-visible){outline:3px solid color-mix(in srgb,var(--accent) 45%,transparent);outline-offset:2px}
+.opt span{line-height:1.5}
+.range{background:var(--card);border:1.5px solid var(--line);border-radius:var(--r);padding:18px 18px 14px;box-shadow:var(--shadow)}
+.sevout{display:flex;align-items:baseline;margin-bottom:14px}
+.sevout b{font-size:46px;line-height:1;font-weight:800;letter-spacing:-.05em;min-width:1.2ch}
+.sevout span{font-size:15px;font-weight:700;color:var(--mute);margin-left:10px}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:12px;border-radius:99px;background:linear-gradient(90deg,#4caf7d,#e9b44c 55%,#d9534f);outline:0;margin:6px 0}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:30px;height:30px;border-radius:50%;background:#fff;border:4px solid var(--ink);box-shadow:0 3px 10px rgba(0,0,0,.28);cursor:grab}
+input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:#fff;border:4px solid var(--ink);box-shadow:0 3px 10px rgba(0,0,0,.28);cursor:grab}
+input[type=range]:focus-visible{outline:3px solid color-mix(in srgb,var(--accent) 45%,transparent);outline-offset:4px}
+.scale{display:flex;justify-content:space-between;color:var(--mute);font-size:12px;font-weight:600;margin-top:6px}
+.nav{position:fixed;left:0;right:0;bottom:0;z-index:5;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);background:color-mix(in srgb,var(--bg) 80%,transparent);border-top:1px solid var(--line);padding:12px 18px calc(12px + env(safe-area-inset-bottom))}
+.nav div{max-width:640px;margin:0 auto;display:flex;gap:10px}
+.btn{font:inherit;font-weight:800;border-radius:14px;padding:15px 18px;border:1.5px solid var(--line2);cursor:pointer;flex:1;text-align:center;text-decoration:none;display:inline-block;transition:transform .15s,box-shadow .15s,opacity .15s;letter-spacing:-.01em}
+.btn:hover:not(:disabled){transform:translateY(-1px)}
+.btn.primary{background:linear-gradient(135deg,var(--accent2),var(--accent));color:var(--accent-ink);border-color:transparent;box-shadow:0 10px 22px -10px var(--accent)}
+.btn.ghost{background:var(--card);color:var(--ink)}
+.btn:disabled{opacity:.38;cursor:not-allowed;box-shadow:none}
+.btn.sm{padding:11px 16px;flex:none;font-size:14px}
+.note{background:var(--bluebg);color:var(--blue);border-radius:var(--r);padding:13px 15px;font-size:14px;margin:0 0 16px;display:flex;gap:10px}
+.note::before{content:"i";flex:none;width:20px;height:20px;border-radius:50%;background:var(--blue);color:var(--bluebg);font-weight:800;font-size:13px;display:grid;place-items:center;margin-top:2px}
+.hero{padding:22px 0 4px}
+.eyebrow{display:inline-flex;gap:8px;align-items:center;font-size:13px;font-weight:800;color:var(--accent);background:color-mix(in srgb,var(--accent) 11%,transparent);padding:6px 13px;border-radius:99px;letter-spacing:.01em}
+.eyebrow::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--accent)}
+.hero h1{font-size:clamp(32px,9vw,42px);line-height:1.14;letter-spacing:-.045em;margin:14px 0 12px}
+.hero h1 em{font-style:normal;background:linear-gradient(transparent 64%,color-mix(in srgb,var(--accent) 28%,transparent) 64%)}
+.feats{display:grid;gap:10px;margin:22px 0 18px}
+.feat{display:flex;gap:14px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:13px 15px;box-shadow:var(--shadow)}
+.feat b{display:block;font-size:15px;letter-spacing:-.02em}
+.feat small{color:var(--mute);font-size:13px}
+.ic{flex:none;width:42px;height:42px;border-radius:13px;display:grid;place-items:center;background:color-mix(in srgb,var(--accent) 12%,transparent);color:var(--accent)}
+.ic svg,.bico svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.banner{display:flex;gap:16px;align-items:flex-start;border:1.5px solid;border-radius:22px;padding:20px;margin:8px 0 18px;box-shadow:var(--shadow)}
+.bico{flex:none;width:48px;height:48px;border-radius:15px;display:grid;place-items:center;background:currentColor}
+.bico svg{width:26px;height:26px;stroke:var(--card)}
+.btxt{min-width:0}
+.banner h1{margin:0 0 6px;font-size:22px}
+.banner p{margin:0;color:var(--ink);opacity:.82}
+.banner.emergency{background:var(--redbg);border-color:var(--red);color:var(--red)}
+.banner.urgent{background:var(--amberbg);border-color:var(--amber);color:var(--amber)}
+.banner.clinic{background:var(--bluebg);border-color:var(--blue);color:var(--blue)}
+.banner.self{background:var(--greenbg);border-color:var(--green);color:var(--green)}
+.banner .call{margin-top:14px;display:flex;gap:10px;flex-wrap:wrap}
+.banner .btn{flex:none}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px;margin-bottom:14px;box-shadow:var(--shadow)}
+.card ul{margin:8px 0 0;padding-left:20px}
+.card li{margin-bottom:6px}
+.card li::marker{color:var(--accent)}
+.card.red{border-color:color-mix(in srgb,var(--red) 55%,var(--line));background:linear-gradient(var(--card),var(--card)) padding-box}
+.card.red h2{color:var(--red)}
+.rank{margin:14px 0}
+.rank .row{display:flex;justify-content:space-between;align-items:baseline;font-weight:800}
+.rank .row em{font-style:normal;font-size:12px;font-weight:800;padding:3px 10px;border-radius:99px;background:var(--line);color:var(--mute)}
+.rank .row em.hi{background:var(--accent);color:var(--accent-ink)}
+.rank .row em.mid{background:color-mix(in srgb,var(--accent) 22%,var(--card));color:var(--accent)}
+.bar{height:10px;background:var(--line);border-radius:99px;overflow:hidden;margin:7px 0}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent));border-radius:99px;animation:grow .8s cubic-bezier(.2,.7,.2,1) both;transform-origin:left}
+@keyframes grow{from{transform:scaleX(0)}}
+.rank small{color:var(--mute)}
+.tag{display:inline-block;font-size:12px;font-weight:800;padding:2px 9px;border-radius:99px;background:var(--line);margin-right:6px;color:var(--mute)}
+details{margin-bottom:14px}
+summary{cursor:pointer;font-weight:800;padding:8px 2px;color:var(--mute)}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:20px 0}
+.actions .btn{flex:none;width:100%}
+.actions #copy{grid-column:1/-1}
+.disc{font-size:13px;color:var(--mute);border-top:1px solid var(--line);padding-top:14px;margin-top:22px}
+footer{max-width:640px;margin:0 auto;padding:0 18px 150px;font-size:12px;color:var(--mute)}
+.log{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.log b{display:block}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:96px;background:var(--ink);color:var(--bg);padding:11px 18px;border-radius:99px;font-size:14px;font-weight:700;z-index:9;box-shadow:var(--shadow)}
+@media print{.nav,.top,.actions,footer{display:none}body{background:#fff}}
+
+.hero-art{display:block;width:100%;max-width:340px;height:auto;margin:18px auto 0}
+.hico{flex:none;width:42px;height:42px;margin:-4px 0}
+.opt.withic{align-items:center}
+.opt.withic .mark{margin-top:0}
+.tips .desc{margin-bottom:6px}
+.tip{display:flex;gap:14px;padding:15px 0;border-top:1px solid var(--line)}
+.tip:first-of-type{border-top:0}
+.tip .ic{width:40px;height:40px;border-radius:12px;margin-top:2px}
+.tip .ic svg{width:21px;height:21px}
+.tip b{letter-spacing:-.02em;line-height:1.4;display:block}
+.tip p{margin:5px 0 0;color:var(--mute);font-size:14.5px;line-height:1.6}
+.tip .warn{color:var(--amber);background:var(--amberbg);border-radius:12px;padding:9px 12px;font-size:13.5px;margin-top:9px}
+.tip.rel{background:color-mix(in srgb,var(--accent) 7%,transparent);margin:0 -10px;padding:15px 10px;border-radius:14px;border-top-color:transparent}
+.badge{display:inline-block;margin-top:5px;font-size:12px;font-weight:800;color:var(--accent-ink);background:var(--accent);border-radius:99px;padding:2px 10px}
+.tips details{margin:0}
+.tips summary{border-top:1px solid var(--line);padding:14px 2px 4px;color:var(--accent)}
+
+.cand{margin:16px 0 4px;padding-bottom:14px;border-bottom:1px solid var(--line)}
+.cand:last-of-type{border-bottom:0}
+.grp{display:inline-block;font-size:11.5px;font-weight:800;color:var(--mute);background:var(--line);padding:2px 8px;border-radius:99px;margin-left:8px;vertical-align:2px}
+.why{font-size:13px;color:var(--mute);margin-top:6px}
+.why b{color:var(--ink);margin-right:4px}
+.cause{padding:12px 0;border-top:1px solid var(--line)}
+.cause b{display:block;letter-spacing:-.02em}
+.cause p{margin:4px 0 0;color:var(--mute);font-size:14.5px;line-height:1.6}
+.reassure{margin:6px 0 0;font-size:13.5px;color:var(--blue);background:var(--bluebg);border-radius:12px;padding:10px 13px}
+fieldset+fieldset{margin-top:6px}
+
+.rank .row{gap:10px;align-items:flex-start}
+.rank .row>span{min-width:0;line-height:1.45}
+.rank .row em{flex:none;white-space:nowrap;margin-top:1px}
+</style>
+</head>
+<body>
+<header class="top"><div class="top-in"><div class="brand"><span class="logo"><svg viewBox="0 0 24 24"><path d="M3 12h4l2.5-6 4 12 2.5-6h5"/></svg></span>두통 체크</div><button class="link" id="btnLog" type="button">내 기록</button></div></header>
+<main id="app"></main>
+<footer>
+근거: 국제두통질환분류 3판(ICHD-3), NICE 지침 CG150(12세 이상 두통의 진단과 관리), 대한신경과학회 두통 안내서. 이 도구는 의료진의 진단·치료를 대신하지 않으며, 입력한 내용은 이 기기 밖으로 전송되지 않습니다.
+</footer>
+
+<script>
+"use strict";
+/* ================= 질문 정의 ================= */
+const STEPS=[
+{id:"emergency",title:"먼저, 지금 이런 증상이 있나요?",desc:"해당되는 것을 모두 골라 주세요. 위쪽은 바로 응급 진료가 필요한 증상, 아래쪽은 오늘 안에 진료를 권하는 증상이에요.",
+ fields:[
+ {id:"em",type:"check",label:"바로 119나 응급실이 필요할 수 있어요",options:[
+ {v:"thunder",l:"벼락 치듯 갑자기 시작해 1분 안에 최고로 아파졌다"},
+ {v:"worst",l:"살면서 겪은 가장 심한 두통이다"},
+ {v:"neuro",l:"팔다리에 힘이 빠지거나 저리다 / 얼굴 한쪽이 처진다 / 말이 어눌하다 / 갑자기 시야가 안 보이거나 물체가 둘로 보인다"},
+ {v:"conscious",l:"의식이 흐리거나 심하게 졸리고 혼란스럽다, 또는 경련을 했다"},
+ {v:"meningitis",l:"열(38℃ 이상)과 함께 목이 뻣뻣해 고개를 숙이기 어렵다"},
+ {v:"rash",l:"열과 함께 멍처럼 번지는 붉은·보라색 반점이 생겼다"},
+ {v:"headinjury",l:"머리를 다친 뒤 구토가 반복되거나, 두통이 점점 심해지거나, 자꾸 졸리다"},
+ {v:"co",l:"같은 공간에 있는 여러 사람이 함께 두통·어지러움·구역이 있다 (난방기구·밀폐된 공간)"},
+ {v:"eye",l:"한쪽 눈이 몹시 아프고 시력이 떨어지며 불빛 주위에 무지개 같은 테가 보인다"},
+ {v:"preg",l:"임신 중이거나 출산 후 6주 이내인데, 심한 두통과 함께 시야가 번쩍이거나 얼굴·손이 붓는다"},
+ {v:"none",l:"위에 해당하는 것이 없다",exclusive:true}]},
+ {id:"warn",type:"check",label:"오늘 안에 진료를 받는 게 좋아요",options:[
+ {v:"worsen",l:"며칠 사이에 두통이 점점 심해지고 있다"},
+ {v:"vomit",l:"두통과 함께 구토가 반복된다 (머리를 다치지는 않았다)"},
+ {v:"dizzy",l:"어지럽고 걸을 때 비틀거리거나 균형이 잡히지 않는다"},
+ {v:"fever",l:"열이 나면서 두통이 심하다 (목은 뻣뻣하지 않다)"},
+ {v:"trauma",l:"머리를 가볍게 부딪친 뒤 두통이 계속된다"},
+ {v:"eyered",l:"한쪽 눈이 빨갛고 아프면서 시야가 뿌옇게 보인다"},
+ {v:"none",l:"해당하는 것이 없다",exclusive:true}]}]},
+{id:"basic",title:"나이대를 알려주세요",desc:"나이에 따라 확인해야 할 위험 신호가 달라져요.",
+ fields:[{id:"age",type:"radio",label:"나이대",options:[
+ {v:"child",l:"만 12세 미만"},{v:"teen",l:"12~17세"},{v:"adult",l:"18~49세"},{v:"mid",l:"50~64세"},{v:"senior",l:"65세 이상"}]}]},
+{id:"course",title:"두통이 어떻게 시작됐나요?",desc:"시작 방식과 경과는 원인을 가리는 데 중요한 단서예요.",
+ fields:[
+ {id:"onset",type:"radio",label:"두통이 심해진 속도",options:[
+  {v:"peak5",l:"갑자기, 5분 안에 가장 심해졌다"},{v:"hours",l:"몇 시간에 걸쳐 점점 심해졌다"},{v:"gradual",l:"며칠~몇 주에 걸쳐 서서히 심해졌다"}]},
+ {id:"since",type:"radio",label:"이번 두통이 이어진 기간",options:[
+  {v:"today",l:"오늘 시작했다"},{v:"days",l:"2일~2주"},{v:"weeks",l:"2주 이상 계속되거나 반복된다"}]},
+ {id:"compare",type:"radio",label:"전에 겪던 두통과 비교하면",options:[
+  {v:"first",l:"이런 두통은 처음이다"},{v:"same",l:"전에도 겪던 두통과 비슷하다"},{v:"changed",l:"전에 겪던 두통인데 양상이나 강도가 달라졌다"}]},
+ {id:"freq",type:"radio",label:"최근 3개월간 두통이 있었던 날",options:[
+  {v:"rare",l:"한 달에 4일 이하이거나 이번이 처음"},{v:"some",l:"한 달에 5~14일"},{v:"chronic",l:"한 달에 15일 이상"}]}]},
+{id:"pain",title:"통증은 어떤가요?",desc:"가장 아팠을 때를 기준으로 답해 주세요.",
+ fields:[
+ {id:"sev",type:"range",label:"통증 단계"},
+ {id:"loc",type:"radio",label:"아픈 위치",options:[
+  {v:"one",l:"머리 한쪽",ic:"one"},{v:"both",l:"머리 양쪽",ic:"both"},{v:"eye",l:"한쪽 눈 주변·관자놀이",ic:"eye"},{v:"face",l:"이마·볼·눈 사이 (얼굴 쪽)",ic:"face"},{v:"back",l:"뒤통수·목 쪽",ic:"back"},{v:"all",l:"머리 전체",ic:"all"}]},
+ {id:"quality",type:"radio",label:"통증의 느낌",options:[
+  {v:"throb",l:"욱신욱신 맥박 치듯 아프다"},{v:"press",l:"조이거나 누르는 듯, 머리띠를 두른 듯하다"},{v:"stab",l:"찌르거나 타는 듯하다"},{v:"other",l:"잘 모르겠다"}]},
+ {id:"dur",type:"radio",label:"한 번 아프면 지속되는 시간",options:[
+  {v:"m30",l:"30분 미만"},{v:"m30to3h",l:"30분~3시간"},{v:"h3to72",l:"3시간~3일"},{v:"d3plus",l:"3일 이상 계속"}]},
+ {id:"act",type:"radio",label:"움직이면",options:[
+  {v:"worse",l:"걷거나 계단을 오르면 더 아프다"},{v:"same",l:"움직여도 비슷하다"},{v:"restless",l:"너무 아파서 가만히 있지 못하고 서성인다"},{v:"none",l:"해당 사항 없음 / 잘 모르겠다"}]}]},
+{id:"sym",title:"두통과 함께 나타나는 증상이 있나요?",desc:"해당되는 것을 모두 고르세요. 없으면 맨 아래 '해당되는 증상이 없다'를 골라 주세요.",
+ fields:[{id:"sym",type:"check",label:"",options:[
+ {v:"nausea",l:"메스꺼움 또는 구토"},{v:"photo",l:"밝은 빛이 불편하다"},{v:"phono",l:"작은 소리도 불편하다"},
+ {v:"aura",l:"두통 전후로 시야에 빛이 번쩍이거나 지그재그가 보이고, 손발이 저린 증상이 5~60분 지나갔다"},
+ {v:"tear",l:"아픈 쪽 눈에서 눈물이 난다"},{v:"redeye",l:"아픈 쪽 눈이 충혈된다"},{v:"nasal",l:"코가 막히거나 콧물이 난다"},
+ {v:"lid",l:"아픈 쪽 눈꺼풀이 처지거나 붓는다"},{v:"sweat",l:"아픈 쪽 이마·얼굴에 땀이 난다"},
+ {v:"neckmusc",l:"목·어깨가 뭉치고 뻐근하다"},
+ {v:"fever",l:"열이 있다 (37.5℃ 이상)"},{v:"stiffneck",l:"고개를 숙이면 목이 뻣뻣하고 아프다"},
+ {v:"dblvision",l:"물체가 둘로 보이거나 시력이 떨어진 상태가 계속된다"},
+ {v:"none",l:"해당되는 증상이 없다",exclusive:true}]}]},
+{id:"red",title:"이런 특징이 있나요?",desc:"두통이 생기는 상황과 생활 속 특징이에요. 해당되는 것을 모두 고르세요.",
+ fields:[{id:"red",type:"check",label:"",options:[
+ {v:"trigger",l:"기침·재채기·힘주기·격한 운동 때 두통이 생기거나 심해진다"},
+ {v:"lying",l:"누우면 심해지고, 아침에 일어났을 때 가장 심하거나 구토와 함께 아프다"},
+ {v:"upright",l:"앉거나 서면 심해지고 누우면 나아진다"},
+ {v:"temple",l:"관자놀이나 두피를 만지면 아프고, 음식을 씹을 때 턱이 아프다"},
+ {v:"jaw",l:"턱이 뻐근하거나 입을 벌릴 때 소리가 나고, 이를 악물거나 간다 (아침에 턱이 피곤하다)"},
+ {v:"tooth",l:"찬 것·뜨거운 것에 이가 시리거나 욱신거리고, 두통과 같은 쪽 이·잇몸이 아프다 (사랑니 포함)"},
+ {v:"eyestrain",l:"화면을 오래 보거나 안경·렌즈 도수가 안 맞는 느낌이 있고, 이마·눈 주위가 아프다"},
+ {v:"osa",l:"코를 크게 골고, 아침에 깰 때 머리가 무겁거나 아프며 낮에 자주 졸리다"},
+ {v:"none",l:"해당되는 것이 없다",exclusive:true}]}]},
+{id:"hist",title:"최근 있었던 일과 앓고 있는 질병",desc:"해당되는 것을 모두 고르세요. 두통의 원인을 가리는 데 큰 도움이 돼요.",
+ fields:[{id:"hist",type:"check",label:"",options:[
+ {v:"trauma",l:"최근 4주 안에 머리를 부딪치거나 다쳤다 (가벼운 충격 포함)"},
+ {v:"surgery",l:"최근 3개월 안에 수술을 받았다"},
+ {v:"spinal",l:"최근 2주 안에 허리 마취나 척수 관련 시술을 받았다"},
+ {v:"sinus",l:"최근 감기나 코막힘, 볼·이마 쪽 압박감이 있다"},
+ {v:"cancer",l:"암 진단을 받았거나 치료 중이다"},
+ {v:"immuno",l:"면역이 약하다 (장기 스테로이드, 항암치료, HIV, 장기이식 등)"},
+ {v:"anticoag",l:"혈액을 묽게 하는 약을 먹는다 (와파린, 리바록사반, 아스피린 등)"},
+ {v:"vascular",l:"뇌졸중·뇌출혈·뇌동맥류 병력이 있거나, 가까운 가족 중 뇌출혈로 쓰러진 사람이 있다"},
+ {v:"htn",l:"고혈압이 있다"},
+ {v:"migDx",l:"편두통이나 긴장형 두통을 진단받은 적이 있다"},
+ {v:"preg",l:"임신 중이거나 출산 후 6주 이내이다"},
+ {v:"newmed",l:"최근 2주 안에 새로 시작하거나 바꾼 약·보충제가 있다"},
+ {v:"none",l:"해당되는 것이 없다",exclusive:true}]}]},
+{id:"life",title:"최근 생활은 어땠나요?",desc:"두통을 부를 수 있는 생활 습관이에요. 해당되는 것을 모두 고르세요.",
+ fields:[{id:"life",type:"check",label:"",options:[
+ {v:"sleep",l:"최근 잠이 부족하거나 불규칙했다"},
+ {v:"stress",l:"스트레스가 많았다"},
+ {v:"meal",l:"식사를 거르거나 불규칙했다"},
+ {v:"caffeine",l:"커피·에너지드링크를 갑자기 줄이거나 거른 날이 있다"},
+ {v:"alcohol",l:"전날 술을 마셨다 (숙취)"},
+ {v:"dehyd",l:"물을 거의 못 마셨거나 땀을 많이 흘렸다"},
+ {v:"screen",l:"스마트폰·컴퓨터를 오래 봤다"},
+ {v:"menstrual",l:"두통이 생리 전후에 반복된다"},
+ {v:"none",l:"해당되는 것이 없다",exclusive:true}]}]},
+{id:"meds",title:"진통제는 얼마나 자주 먹나요?",desc:"두통 때문에 먹는 약 기준이에요. 진통제를 너무 자주 먹으면 두통이 더 잦아질 수 있어요.",
+ fields:[{id:"meds",type:"radio",label:"최근 한 달간 진통제를 먹은 날",options:[
+ {v:"m0",l:"거의 먹지 않는다 (월 4일 이하)"},{v:"m5",l:"월 5~9일"},{v:"m10",l:"월 10일 이상"}]}]}
+];
+const RESULT=STEPS.length+1;
+
+/* ================= 두통 유형 (ICHD-3 분류 참고) ================= */
+/* f: [조건, 가중치, 근거 문구] / p: [조건, 감점] / gate: 필수 조건(없으면 cap 이하로 제한) */
+const TYPE_DEFS={
+ migraine:{name:"편두통",grp:"일차성",max:12,
+  desc:"한쪽 또는 양쪽이 욱신거리고, 움직이면 심해지며, 메스꺼움·빛·소리 민감이 함께 나타나요.",
+  care:"편두통은 유발 요인(수면 부족, 식사 거름, 스트레스, 특정 음식)을 기록하고 피해 보세요. 어둡고 조용한 곳에서 쉬면 도움이 돼요.",
+  f:[[c=>c.a.dur==="h3to72",2,"한 번 아프면 3시간~3일 이어짐"],[c=>c.a.loc==="one",1.5,"머리 한쪽이 아픔"],[c=>c.a.quality==="throb",2,"욱신거리는 통증"],
+   [c=>c.sv>=5,1,"통증이 중간 이상"],[c=>c.a.act==="worse",1.5,"움직이면 더 아픔"],[c=>c.S.has("nausea"),1.5,"메스꺼움·구토"],
+   [c=>c.S.has("photo"),1,"빛이 불편함"],[c=>c.S.has("phono"),1,"소리가 불편함"],[c=>c.S.has("aura"),2,"전조(시야 번쩍임 등)"],
+   [c=>c.L.has("menstrual"),1,"생리 전후에 반복됨"],[c=>c.H.has("migDx"),1,"편두통 진단 경험"],
+   [c=>c.L.has("sleep")||c.L.has("stress")||c.L.has("meal"),.5,"수면·스트레스·식사 같은 유발 요인"]],
+  p:[[c=>c.sv<=2,2]]},
+ tension:{name:"긴장형 두통",grp:"일차성",max:9,
+  desc:"양쪽이 조이거나 누르는 느낌이고, 통증이 가볍거나 중간 정도이며 움직여도 심해지지 않아요.",
+  care:"목·어깨 스트레칭, 따뜻한 찜질, 화면 보는 자세와 쉬는 시간을 점검하세요.",
+  f:[[c=>c.a.loc==="both",1.5,"머리 양쪽이 아픔"],[c=>c.a.loc==="all",1,"머리 전체가 아픔"],[c=>c.a.quality==="press",2.5,"조이거나 누르는 느낌"],
+   [c=>c.sv>=1&&c.sv<=6,1,"통증이 가볍거나 중간 정도"],[c=>c.a.act==="same",1.5,"움직여도 심해지지 않음"],
+   [c=>["h3to72","d3plus"].includes(c.a.dur),1,"몇 시간~며칠 이어짐"],[c=>c.S.has("neckmusc"),1,"목·어깨가 뻐근함"],
+   [c=>c.L.has("stress")||c.L.has("sleep"),.5,"스트레스·수면 부족"],[c=>c.L.has("screen"),.5,"화면을 오래 봄"]],
+  p:[[c=>c.S.has("nausea"),1.5],[c=>c.S.has("photo")&&c.S.has("phono"),1.5],[c=>c.S.has("aura"),3],[c=>c.sv>=8,1.5],[c=>c.a.quality==="throb",1.5],[c=>c.a.act==="worse",1]]},
+ cluster:{name:"군발두통",grp:"일차성",max:14,cap:20,gate:c=>c.a.loc==="eye"||c.auto>=1,
+  desc:"한쪽 눈 주변이 극심하게 아프고, 같은 쪽 눈물·충혈·코막힘이 있으며 가만히 있지 못해요.",
+  care:"술과 담배는 발작을 부를 수 있어 피하세요. 증상이 반복되면 신경과에서 전용 치료를 받는 것이 좋아요.",
+  f:[[c=>c.a.loc==="eye",3,"한쪽 눈 주변이 아픔"],[c=>c.a.dur==="m30to3h",3,"30분~3시간 이어지는 발작"],[c=>c.a.dur==="m30",1,"짧게 끝나는 통증"],
+   [c=>c.sv>=8,1.5,"통증이 매우 심함"],[c=>c.a.quality==="stab",1.5,"찌르거나 타는 듯함"],[c=>c.auto>=1,2,"같은 쪽 눈물·충혈·눈꺼풀·땀"],
+   [c=>c.auto>=2,1.5,"자율신경 증상이 여러 개"],[c=>c.a.act==="restless",2.5,"가만히 있지 못함"],[c=>c.a.loc==="one",.5,"한쪽 통증"]]},
+ sinus:{name:"부비동염(축농증) 관련 두통",grp:"이차성",max:10,cap:20,gate:c=>c.a.loc==="face"||c.H.has("sinus")||(c.S.has("nasal")&&!c.S.has("tear")),
+  desc:"감기나 코막힘 뒤에 이마·볼·눈 사이가 묵직하게 아프고, 숙이면 더 아플 수 있어요.",
+  dept:["이비인후과","코막힘·콧물과 함께 볼·이마가 묵직하게 아프면 부비동염인지 확인해 보세요."],
+  care:"따뜻한 수건 찜질, 충분한 수분, 식염수 코세척이 도움이 될 수 있어요. 열이 나거나 오래 이어지면 이비인후과에 가세요.",
+  f:[[c=>c.a.loc==="face",3.5,"이마·볼 쪽이 아픔"],[c=>c.H.has("sinus"),3,"감기·코막힘이 있음"],[c=>c.S.has("fever"),1.5,"열이 있음"],
+   [c=>c.S.has("nasal")&&!c.S.has("tear"),1,"코막힘·콧물"],[c=>c.a.quality==="press",1,"누르는 듯한 통증"],[c=>c.a.since!=="today",.5,"며칠째 이어짐"],[c=>c.sv<=7,.5,"통증이 아주 심하지는 않음"]],
+  p:[[c=>c.S.has("aura"),2]]},
+ neck:{name:"목에서 오는 두통(경추성)",grp:"이차성",max:8,cap:20,gate:c=>c.a.loc==="back"||c.S.has("neckmusc"),
+  desc:"뒤통수에서 머리 쪽으로 퍼지고, 목을 움직이거나 나쁜 자세에서 심해지며 목·어깨가 뻐근해요.",
+  dept:["정형외과 또는 재활의학과","목과 어깨 근육·관절 문제인지 확인해 보세요."],
+  care:"오래 앉아 있을 땐 50분마다 일어나 목·어깨를 풀고, 화면 높이를 눈높이에 맞추세요.",
+  f:[[c=>c.a.loc==="back",3.5,"뒤통수·목 쪽이 아픔"],[c=>c.S.has("neckmusc"),2.5,"목·어깨가 뻐근함"],[c=>c.a.quality==="press",1,"누르는 듯함"],
+   [c=>c.L.has("screen"),1,"화면을 오래 봄"],[c=>c.sv<=7,.5,"통증이 아주 심하지는 않음"]]},
+ medoveruse:{name:"약물과용두통(진통제 과다 사용)",grp:"이차성",max:9,cap:15,gate:c=>c.a.meds==="m5"||c.a.meds==="m10",
+  desc:"진통제를 자주 먹을수록 오히려 두통이 더 잦아지는 악순환이에요.",
+  dept:["신경과 (두통 클리닉)","진통제를 줄이는 계획이 필요해서 의사와 상담하는 것이 좋아요."],
+  care:"진통제를 먹은 날을 달력에 적어 월 10일을 넘기지 않도록 하세요. 이미 자주 먹고 있다면 임의로 끊지 말고 의사와 줄이는 계획을 세우세요.",
+  f:[[c=>c.a.meds==="m10",5,"진통제를 월 10일 이상 먹음"],[c=>c.a.meds==="m5",2,"진통제를 월 5~9일 먹음"],[c=>c.a.freq==="chronic",3,"두통이 월 15일 이상"],
+   [c=>c.a.freq==="some",1,"두통이 월 5~14일"],[c=>c.a.since==="weeks",1,"2주 이상 반복됨"]]},
+ tmd:{name:"턱관절·치아 관련 두통",grp:"이차성",max:9,cap:15,gate:c=>c.R.has("jaw")||c.R.has("tooth"),
+  desc:"이를 악물거나 가는 습관, 턱관절 문제, 치아·잇몸 염증이 관자놀이·뺨·귀 앞쪽 통증을 만들 수 있어요.",
+  dept:["치과 또는 구강내과","이가 시리거나 욱신거리고, 턱이 뻐근하거나 소리가 나고, 이를 악무는 습관이 있다면 두통의 원인이 치아·턱관절일 수 있어요. 신경과보다 치과나 구강내과에서 먼저 확인해 보세요."],
+  care:"딱딱한 음식과 껌을 줄이고, 낮에 이를 악물고 있지 않은지 살펴보세요. 입을 크게 벌리는 동작은 피하세요.",
+  f:[[c=>c.R.has("jaw"),4.5,"턱이 뻐근하거나 이를 악묾"],[c=>c.R.has("tooth"),4.5,"이·잇몸이 시리거나 아픔"],[c=>c.a.loc==="face",1.5,"얼굴 쪽 통증"],
+   [c=>c.a.loc==="one",1,"한쪽 통증"],[c=>c.a.quality==="press"||c.a.quality==="stab",.5,"누르거나 찌르는 통증"],[c=>c.sv<=7,.5,"통증이 아주 심하지는 않음"]]},
+ eye:{name:"눈 피로·시력 관련 두통",grp:"이차성",max:9,cap:20,gate:c=>c.R.has("eyestrain")||c.L.has("screen"),
+  desc:"화면을 오래 보거나 도수가 맞지 않을 때 이마·눈 주위가 뻑뻑하게 아파요.",
+  dept:["안과","도수가 맞는지, 눈 피로가 있는지 시력 검사를 받아 보세요."],
+  care:"20분마다 20초씩 6m 이상 먼 곳을 보고, 화면 밝기를 조절하고, 안경·렌즈 도수를 점검하세요.",
+  f:[[c=>c.R.has("eyestrain"),5,"눈이 피로하고 이마·눈 주위가 아픔"],[c=>c.L.has("screen"),2,"화면을 오래 봄"],[c=>c.a.loc==="face",2.5,"이마·눈 사이가 아픔"],
+   [c=>c.sv<=6,1,"통증이 심하지 않음"],[c=>c.S.has("photo"),1,"빛이 불편함"]]},
+ osa:{name:"수면무호흡·수면 관련 두통",grp:"이차성",max:7,cap:15,gate:c=>c.R.has("osa"),
+  desc:"자는 동안 숨이 자주 멈추면 아침에 머리가 무겁거나 아픈 두통이 생길 수 있어요.",
+  dept:["수면클리닉 또는 이비인후과","코골이와 아침 두통, 낮 졸림이 함께라면 수면무호흡 검사를 고려해 보세요."],
+  care:"옆으로 누워 자고 자기 전 술을 피하세요. 코골이가 심하면 수면 검사를 받아 보세요.",
+  f:[[c=>c.R.has("osa"),5,"코골이와 아침의 무거운 머리"],[c=>c.L.has("sleep"),1.5,"수면이 부족하거나 불규칙함"],[c=>c.a.loc==="all"||c.a.loc==="both",1,"머리 전체·양쪽이 아픔"],[c=>c.sv<=6,.5,"통증이 심하지 않음"]]},
+ transient:{name:"숙취·탈수·카페인 금단 같은 일시적 두통",grp:"이차성",max:8,cap:20,gate:c=>c.L.has("alcohol")||c.L.has("caffeine")||c.L.has("dehyd")||c.L.has("meal"),
+  desc:"술, 수분 부족, 카페인 갑작스러운 감소, 공복 같은 생활 요인 때문에 생기고 대개 며칠 안에 좋아져요.",
+  care:"물을 충분히 마시고 식사를 챙기세요. 카페인은 갑자기 끊지 말고 며칠에 걸쳐 줄이세요.",
+  f:[[c=>c.L.has("alcohol"),5,"전날 술을 마심"],[c=>c.L.has("caffeine"),4.5,"카페인을 갑자기 줄이거나 거름"],[c=>c.L.has("dehyd"),2.5,"수분이 부족하거나 땀을 많이 흘림"],
+   [c=>c.L.has("meal"),1.5,"식사를 거름"],[c=>c.a.since==="today",1,"오늘 시작됨"],[c=>c.a.loc==="both"||c.a.loc==="all",1,"머리 양쪽·전체가 아픔"],[c=>c.sv<=6,.5,"통증이 심하지 않음"]]},
+ infection:{name:"감기·독감 등 감염에 동반된 두통",grp:"이차성",max:7,cap:20,gate:c=>c.S.has("fever")||c.H.has("sinus"),
+  desc:"열이 나는 감염 때 몸살과 함께 머리 전체가 아프게 돼요.",
+  dept:["내과 또는 가정의학과","열을 동반한 두통은 감염 여부를 확인받아 보세요."],
+  care:"충분히 쉬고 수분을 섭취하세요. 열이 계속되거나 목이 뻣뻣해지면 바로 진료를 받으세요.",
+  f:[[c=>c.S.has("fever"),4,"열이 있음"],[c=>c.H.has("sinus"),2,"감기·코막힘이 있음"],[c=>c.a.loc==="all",1,"머리 전체가 아픔"],[c=>c.a.since==="today"||c.a.since==="days",1,"최근 며칠 사이 시작됨"]]},
+ trauma:{name:"외상 후 두통",grp:"이차성",max:8,cap:10,gate:c=>c.H.has("trauma"),
+  desc:"머리를 다친 뒤 며칠~몇 주 동안 이어지는 두통이에요. 위험 신호가 없는지 확인이 먼저예요.",
+  dept:["신경외과 또는 신경과","머리를 다친 뒤 두통이 이어진다면 진찰과 필요시 영상검사를 받아 보세요."],
+  care:"머리를 다친 뒤 두통이 이어진다면 충분히 쉬되, 구토·졸림·점점 심해지는 두통이 생기면 바로 응급실로 가세요.",
+  f:[[c=>c.H.has("trauma"),6,"최근 머리를 다침"],[c=>c.a.since==="today"||c.a.since==="days",1,"최근 시작됨"],[c=>c.a.compare==="first",1,"처음 겪는 두통"]]},
+ newmed:{name:"새로 시작한 약 관련 두통(약 부작용)",grp:"이차성",max:7,cap:10,gate:c=>c.H.has("newmed"),
+  desc:"새로 먹기 시작하거나 바꾼 약·보충제 때문에 두통이 생길 수 있어요.",
+  dept:["처방한 병원 또는 약국","약을 임의로 끊지 말고 두통이 시작된 시점과 함께 상담하세요."],
+  care:"약을 임의로 끊지 말고, 처방한 의사나 약사에게 두통이 시작된 시점을 말하고 상담하세요.",
+  f:[[c=>c.H.has("newmed"),5,"최근 약을 새로 시작하거나 바꿈"],[c=>c.a.since==="today"||c.a.since==="days",1,"최근 시작됨"],[c=>c.a.compare==="first",1.5,"처음 겪는 두통"]]}
+};
+const TYPE_COUNT=Object.keys(TYPE_DEFS).length;
+
+/* 응급·긴급 원인 쉬운 설명 */
+const CAUSES={
+ sah:{n:"지주막하출혈 등 뇌출혈",d:"뇌 표면의 혈관이 터져 피가 고이는 병이에요. 갑자기 망치로 맞은 듯 시작되는 극심한 두통이 대표적이고, 빨리 영상검사와 치료를 받아야 해요."},
+ stroke:{n:"뇌졸중",d:"뇌혈관이 막히거나 터져서 뇌 기능이 갑자기 떨어지는 병이에요. 팔다리 힘 빠짐, 말 어눌함, 얼굴 처짐이 신호이고, 치료가 빠를수록 후유증이 줄어요."},
+ conscious:{n:"의식 변화·경련",d:"정신이 흐려지거나 경련이 있는 것은 뇌출혈, 뇌 감염, 뇌졸중 등 여러 원인이 있을 수 있는 신호예요. 응급실에서 원인을 바로 찾아야 해요."},
+ mening:{n:"뇌수막염",d:"뇌와 척수를 감싼 막에 생긴 감염이에요. 열, 두통, 목 뻣뻣함이 대표 증상이고, 번지는 붉은·보라색 반점은 혈액까지 퍼졌다는 신호일 수 있어서 항생제 치료가 급해요."},
+ bleed:{n:"머리 안 출혈(두개내 출혈)",d:"머리를 다친 뒤 뇌 안이나 표면에 피가 천천히 고이는 상태예요. 처음엔 괜찮다가 몇 시간~며칠 뒤 나빠질 수 있고, 혈액을 묽게 하는 약을 먹으면 더 위험해요."},
+ co:{n:"일산화탄소 중독",d:"난방기구나 밀폐된 공간에서 생기는 냄새 없는 가스 때문에 생겨요. 함께 있던 사람들이 같이 두통·어지러움을 느낀다면 의심하고, 먼저 밖으로 나가세요."},
+ glaucoma:{n:"급성 녹내장 등 눈 응급",d:"눈 안 압력이 갑자기 올라 심한 눈 통증과 두통, 시야 흐림이 생겨요. 몇 시간 안에 치료하지 않으면 시력을 잃을 수 있어요."},
+ pree:{n:"자간전증(임신·산후 혈압 질환)",d:"임신 중이나 출산 직후 혈압이 급격히 오르면서 두통, 시야 번쩍임, 붓기가 생겨요. 산모와 아기 모두에게 위험해서 바로 확인이 필요해요."},
+ newold:{n:"50세 이후 새로 생긴 두통",d:"나이가 들어 처음 생긴 두통은 혈관 염증이나 뇌 안 병변처럼 원인이 있는 경우가 많아서, 영상·혈액 검사로 확인하는 것이 원칙이에요."},
+ gca:{n:"측두동맥염",d:"50세 이상에서 관자놀이 혈관에 염증이 생기는 병이에요. 관자놀이 압통, 씹을 때 턱 통증이 특징이고, 늦으면 시력을 잃을 수 있어서 빨리 혈액검사와 치료를 시작해요."},
+ canimm:{n:"암·면역저하 중의 새 두통",d:"암이 뇌로 퍼졌거나 면역이 약해서 생긴 감염일 수 있어요. 새롭거나 달라진 두통은 주치의에게 바로 알리고 영상검사를 받는 것이 안전해요."},
+ valsalva:{n:"기침·힘줄 때 생기는 두통",d:"대부분 위험하지 않지만, 새로 생겼다면 뇌 아래쪽 구조 이상 같은 원인이 숨어 있을 수 있어서 MRI로 한 번 확인해요."},
+ icp:{n:"머리 안 압력 상승",d:"누우면 심해지고 아침이나 구토와 함께 아픈 두통은 뇌종양, 뇌수종, 뇌정맥 혈전 등으로 머리 안 압력이 올라간 신호일 수 있어요. 영상검사로 확인해요."},
+ cranial:{n:"복시·시력 저하",d:"물체가 둘로 보이거나 시력이 떨어지는 것은 눈을 움직이는 신경, 안압, 뇌압 문제와 관련될 수 있어서 안과·신경과 진찰이 필요해요."},
+ postop:{n:"수술 후 새로운 두통",d:"수술 후에는 출혈, 감염, 마취·약물의 영향 등으로 두통이 생길 수 있어요. 수술받은 병원에 연락하는 것이 가장 빨라요."},
+ pdph:{n:"경막천자후 두통",d:"허리 마취나 시술 뒤 뇌척수액이 새면서 생겨요. 앉거나 서면 심해지고 누우면 나아지는 것이 특징이고, 시술한 병원에서 치료할 수 있어요."},
+ vasc:{n:"뇌혈관 질환 재발 가능성",d:"뇌졸중·뇌출혈·뇌동맥류 병력이나 가족력이 있으면 새롭거나 달라진 두통을 더 조심해야 해요. 영상검사로 혈관 상태를 확인해요."},
+ inf:{n:"감염에 의한 두통",d:"감기·독감 같은 흔한 감염으로도 열과 두통이 올 수 있지만, 상태가 심하거나 면역이 약하면 뇌까지 감염이 번졌는지 확인이 필요해요."},
+ changed:{n:"평소와 달라진 두통",d:"오래 겪던 두통이라도 양상이나 강도가 크게 바뀌면 다른 원인이 생겼을 수 있어요. '달라졌다'는 사실 자체가 중요한 단서예요."},
+ childc:{n:"소아의 강한 두통",d:"소아는 증상을 정확히 말하기 어려워서, 강한 두통은 소아청소년과에서 원인을 확인하는 것이 안전해요."},
+ htn:{n:"혈압이 매우 높을 때의 두통",d:"혈압이 크게 오르면 심한 두통이 생길 수 있어요. 집에서 혈압을 재 보고 매우 높으면 바로 진료를 받으세요."},
+ sevc:{n:"매우 심한 통증",d:"통증이 9~10단계라면 원인과 관계없이 빨리 진료받아 통증을 조절하고 위험한 원인이 있는지 확인하는 것이 좋아요."},
+ progress:{n:"점점 심해지는 두통",d:"며칠 사이 계속 심해지는 두통은 편두통 같은 흔한 원인보다 뇌압 상승, 감염, 약물 문제 등을 확인해야 하는 경우가 있어요."},
+ vomit:{n:"반복되는 구토와 두통",d:"편두통일 수도 있지만 뇌압 상승이나 감염, 탈수가 원인일 수도 있어서 오늘 안에 진찰받는 것이 좋아요."},
+ balance:{n:"어지러움·균형 이상",d:"비틀거림은 소뇌나 뇌줄기 쪽 문제(뇌졸중 등)의 신호일 수 있어서 빨리 신경학적 검사가 필요해요."}
+};
+const EM_TXT={
+ thunder:"벼락 치듯 갑자기 시작해 1분 안에 최고로 심해진 두통",
+ worst:"살면서 겪은 가장 심한 두통",
+ neuro:"새로 생긴 마비·감각 저하·말 어눌함·시야 이상",
+ conscious:"의식 변화, 극심한 졸림·혼란, 또는 경련",
+ meningitis:"발열과 목 뻣뻣함이 함께 있음",
+ rash:"발열과 함께 번지는 붉은·보라색 반점",
+ headinjury:"머리 외상 후 반복 구토·점점 심해지는 두통·졸림",
+ co:"여러 사람이 동시에 두통·어지러움·구역. 즉시 창문을 열고 밖으로 나가세요",
+ eye:"심한 안통·시력 저하·불빛 주위 무지개 테",
+ preg:"임신·산후 중 심한 두통과 시야 이상·부종"
+};
+const EM_CAUSE={thunder:"sah",worst:"sah",neuro:"stroke",conscious:"conscious",meningitis:"mening",rash:"mening",headinjury:"bleed",co:"co",eye:"glaucoma",preg:"pree"};
+
+/* ================= 상태 ================= */
+const app=document.getElementById("app");
+const state={step:0,a:{sev:5},view:"wizard"};
+function lab(fid,v){
+ for(const s of STEPS)for(const f of s.fields)if(f.id===fid&&f.options){const o=f.options.find(x=>x.v===v);if(o)return o.l}
+ return v;
+}
+
+/* ================= 판정 ================= */
+function scoreTypes(a){
+ const c={a,sv:+a.sev,S:new Set(a.sym||[]),R:new Set(a.red||[]),H:new Set(a.hist||[]),L:new Set(a.life||[])};
+ c.auto=["tear","redeye","nasal","lid","sweat"].filter(x=>c.S.has(x)).length;
+ const out=[];
+ for(const [key,d] of Object.entries(TYPE_DEFS)){
+  let s=0;const why=[];
+  for(const [fn,w,txt] of d.f){if(fn(c)){s+=w;why.push([w,txt])}}
+  for(const [fn,w] of (d.p||[])){if(fn(c))s-=w}
+  s=Math.max(0,s);
+  let pct=Math.min(100,Math.round(s/d.max*100));
+  if(d.gate&&!d.gate(c))pct=Math.min(pct,d.cap||15);
+  why.sort((x,y)=>y[0]-x[0]);
+  out.push({key,def:d,pct,why:why.slice(0,3).map(x=>x[1]),label:pct>=60?"가능성 높음":pct>=40?"가능성 보통":"가능성 낮음",lv:pct>=60?"hi":pct>=40?"mid":"lo"});
+ }
+ return out.sort((x,y)=>y.pct-x.pct);
+}
+
+function evaluate(a){
+ const S=new Set(a.sym||[]),Rd=new Set(a.red||[]),H=new Set(a.hist||[]),W=new Set(a.warn||[]);
+ const hs=v=>S.has(v),hr=v=>Rd.has(v),hh=v=>H.has(v);
+ const sv=+a.sev,old=["mid","senior"].includes(a.age),child=a.age==="child";
+ const notSame=a.compare!=="same";
+ const R={emergency:[],urgent:[],clinic:[]};
+ const add=(L,k,t,c)=>{if(!R[L].some(x=>x.k===k))R[L].push({k,t,c})};
+ (a.em||[]).filter(x=>x!=="none").forEach(k=>add("emergency",k,EM_TXT[k],EM_CAUSE[k]));
+ if(a.onset==="peak5"&&notSame)add("emergency","peak5","5분 안에 최고 강도에 이르는 갑작스러운 두통 (처음이거나 평소와 다른 경우)","sah");
+ if(hs("fever")&&hs("stiffneck"))add("emergency","meningitis","발열과 목 뻣뻣함이 함께 있음","mening");
+ if(hh("trauma")&&hh("anticoag"))add("emergency","anticoag","혈액을 묽게 하는 약을 먹는 중에 최근 머리를 다침","bleed");
+
+ if(W.has("worsen"))add("urgent","worsen","며칠 사이 두통이 점점 심해지고 있음","progress");
+ if(W.has("vomit"))add("urgent","vomit","두통과 함께 반복되는 구토","vomit");
+ if(W.has("dizzy"))add("urgent","dizzy","어지러움과 균형 이상이 함께 있음","balance");
+ if(W.has("fever"))add("urgent","fever","열이 나면서 두통이 심함","inf");
+ if(W.has("trauma"))add("urgent","trauma","머리를 부딪친 뒤 두통이 이어지고 있음","bleed");
+ if(W.has("eyered"))add("urgent","eyered","눈 통증·충혈과 흐릿한 시야 (눈 질환 가능성)","glaucoma");
+
+ if(old&&a.compare==="first")add("urgent","newold","50세 이후 처음 생긴 두통","newold");
+ if(old&&hr("temple"))add("urgent","gca","50세 이상에서 관자놀이·두피 압통이나 씹을 때 턱 통증","gca");
+ if((hh("cancer")||hh("immuno"))&&notSame)add("urgent","canimm","암 또는 면역저하 상태에서 새롭거나 달라진 두통","canimm");
+ if(hr("trigger")&&notSame)add("urgent","trigger","기침·힘주기·격한 운동으로 유발되는 새로운 두통","valsalva");
+ if(hr("lying"))add("urgent","lying","누우면 심해지거나 아침에 가장 심하고 구토를 동반하는 두통","icp");
+ if(hs("dblvision"))add("urgent","dbl","물체가 둘로 보이거나 시력이 떨어진 상태가 계속됨","cranial");
+ if(hh("surgery")&&notSame)add("urgent","surgery","최근 수술 후 새롭거나 달라진 두통","postop");
+ if(hh("spinal")&&hr("upright"))add("urgent","pdph","허리 마취·척수 시술 후 앉거나 서면 심해지는 두통","pdph");
+ if(hh("vascular")&&notSame)add("urgent","vasc","뇌혈관 질환 병력 또는 가족력이 있으면서 새롭거나 달라진 두통","vasc");
+ if(hh("trauma")&&!hh("anticoag")&&(a.compare!=="same"||a.since!=="weeks"))add("urgent","trauma","최근 머리 외상 이후 생긴 두통","bleed");
+ if(hs("fever")&&!hs("stiffneck")&&(sv>=7||hh("immuno")||a.age==="senior"||child))add("urgent","fever","발열을 동반한 두통 (통증이 심하거나 면역·나이·소아 위험 요인이 있음)","inf");
+ if(a.compare==="changed"&&(sv>=7||old))add("urgent","changed","평소 두통과 양상·강도가 크게 달라짐","changed");
+ if(hh("preg")&&(sv>=5||notSame))add("urgent","pregh","임신·산후 중 두통 (혈압과 소변 검사 확인 필요)","pree");
+ if(child&&sv>=7)add("urgent","child","소아에서 강한 두통","childc");
+ if(hh("htn")&&sv>=8)add("urgent","htn","고혈압이 있으면서 매우 심한 두통","htn");
+ if(sv>=9)add("urgent","sev","통증이 9~10단계로 매우 심함","sevc");
+
+ const cand=scoreTypes(a),top=cand[0];
+ const cp=k=>cand.find(x=>x.key===k).pct;
+ if(a.freq==="chronic")add("clinic","chronic","한 달에 15일 이상 두통이 있음 (만성 두통)");
+ if(a.meds==="m10"||cp("medoveruse")>=50)add("clinic","moh","진통제를 월 10일 이상 사용 (약물과용두통 가능성)");
+ if(a.compare==="first"&&sv>=5)add("clinic","first","처음 겪는 두통이면서 통증이 중간 이상");
+ if(a.since==="weeks")add("clinic","weeks","두통이 2주 이상 이어지거나 반복됨");
+ if(top.key==="cluster"&&top.pct>=50)add("clinic","cluster","군발두통의 특징이 뚜렷함 (전문 치료가 필요한 두통)");
+ if(top.key==="migraine"&&top.pct>=60&&(sv>=6||a.freq!=="rare"))add("clinic","mig","편두통 특징이 뚜렷하고 통증이 강하거나 자주 반복됨");
+ if(a.compare==="changed")add("clinic","chg","평소 두통의 양상이나 강도가 달라짐");
+ if(hr("temple")&&!old)add("clinic","temple","관자놀이·두피 압통 또는 씹을 때 턱 통증");
+ if(hs("fever")&&!R.urgent.length)add("clinic","fever2",a.since==="today"?"열을 동반한 두통 (48시간 안에 좋아지지 않으면 진료)":"열이 며칠째 이어지는 두통 (진료를 권장)");
+ if(child)add("clinic","childv","만 12세 미만은 소아청소년과 진료를 권장");
+ if(hh("preg"))add("clinic","pregv","임신·산후 중에는 약 선택이 제한되므로 의료진과 상의");
+ if(hh("newmed"))add("clinic","newmed","최근 시작·변경한 약이 두통의 원인일 수 있음");
+ if(hh("sinus")&&sv>=5)add("clinic","sinus","감기·코막힘과 함께 얼굴 압박감 (부비동 문제 가능성)");
+
+ const level=R.emergency.length?"emergency":R.urgent.length?"urgent":R.clinic.length?"clinic":"self";
+ return{level,R,cand,top};
+}
+
+/* ================= 안내 구성 ================= */
+function plan(a,r){
+ const hh=v=>(a.hist||[]).includes(v),hs=v=>(a.sym||[]).includes(v);
+ const em=a.em||[],L=r.level,depts=[],tests=[],care=[];
+ const eyeCase=em.includes("eye")||hs("dblvision")||(a.warn||[]).includes("eyered");
+ const child=a.age==="child";
+ if(L==="emergency"){
+  depts.push(["119 또는 응급실","지금 바로 119에 전화하거나 가까운 응급실로 가세요. 직접 운전하지 말고 보호자와 함께 이동하세요. 신경과·신경외과 진료가 가능한 종합병원 응급실이 좋고, 가까운 응급실은 응급의료포털(e-gen.or.kr)에서 찾을 수 있어요."]);
+  if(em.includes("eye"))depts.push(["안과 진료가 가능한 응급실","급성 녹내장은 몇 시간 안에 치료해야 시력을 지킬 수 있어요."]);
+  if(em.includes("preg"))depts.push(["산부인과 진료가 가능한 응급실","혈압과 태아 상태를 함께 확인해야 해요."]);
+  if(child)depts.push(["소아 응급 진료가 가능한 병원","소아청소년과 응급 진료가 되는 곳을 먼저 확인하세요."]);
+  tests.push("신경학적 진찰 (의식, 말, 시야, 동공, 팔다리 힘과 감각)");
+  tests.push("뇌 CT: 뇌출혈 여부를 빠르게 확인");
+  tests.push("필요하면 CT 혈관조영 또는 MRI: 혈관 이상이나 CT로 보기 어려운 병변 확인");
+  if(em.includes("meningitis")||em.includes("rash")||(hs("fever")&&hs("stiffneck")))tests.push("혈액검사와 뇌척수액검사: 뇌수막염 등 감염 확인");
+  if(em.includes("co"))tests.push("혈중 일산화탄소헤모글로빈 검사");
+  if(em.includes("eye"))tests.push("안압 검사와 안과 진찰");
+  if(em.includes("preg"))tests.push("혈압 측정, 소변 단백 검사, 혈액검사");
+  care.push("증상이 시작된 시각을 메모하고, 복용 중인 약 이름(특히 혈액 묽게 하는 약)을 챙기세요.");
+  care.push("응급실에 가기 전까지 새로 진통제를 먹지 말고, 혼자 있지 마세요.");
+  if(em.includes("co"))care.unshift("지금 바로 창문을 열고 신선한 공기가 있는 곳으로 나가세요. 난방기구는 끄세요.");
+ }else if(L==="urgent"){
+  depts.push(["오늘 안에 진료: 응급실 또는 당일 진료되는 신경과·내과","가능하면 오늘 중에 가세요. 평일 낮이라면 신경과나 내과, 그렇지 않다면 응급실이 좋아요. 증상이 심해지면 기다리지 말고 응급실로 가세요."]);
+  if(eyeCase)depts.push(["안과","시력 저하·복시·눈 통증이 있으면 안과 진찰도 필요해요."]);
+  if(hh("trauma")||(a.warn||[]).includes("trauma"))depts.push(["응급실 또는 신경외과","머리 외상 후 두통은 영상검사가 필요할 수 있어요."]);
+  if(hh("preg"))depts.push(["산부인과","혈압과 소변 검사를 먼저 받아보세요."]);
+  if(child)depts.push(["소아청소년과","소아는 소아청소년과에서 먼저 진찰받는 것이 좋아요."]);
+  tests.push("신경학적 진찰과 혈압 측정");
+  tests.push("뇌 CT 또는 MRI: 의사가 위험 신호를 보고 필요성을 판단해요");
+  if(["mid","senior"].includes(a.age)&&(a.red||[]).includes("temple"))tests.push("혈액검사(ESR, CRP): 측두동맥염 확인. 필요하면 측두동맥 검사");
+  if(hs("fever")||(a.warn||[]).includes("fever"))tests.push("혈액검사 등 감염 확인");
+  if(hh("preg"))tests.push("소변 단백 검사와 혈액검사");
+  if(hh("cancer")||hh("immuno")||(a.red||[]).includes("lying"))tests.push("뇌 MRI(조영제 사용 여부는 의료진 판단)");
+  care.push("증상이 갑자기 심해지거나 위의 응급 증상이 생기면 바로 119 또는 응급실로 가세요.");
+  care.push("두통이 시작된 시점, 최근 사고·수술, 복용 약 이름을 메모해 가세요.");
+ }else{
+  if(L==="clinic"){
+   depts.push(["신경과 (두통 클리닉)","가능하면 며칠~2주 안에 예약하세요. 신경과 접근이 어려우면 가정의학과·내과에서 먼저 상담해도 돼요."]);
+   if(r.top.key==="cluster"&&r.top.pct>=50)depts.push(["신경과 (가능하면 1주 이내)","군발두통은 일반 진통제로 잘 조절되지 않고 전용 치료가 있어요. 통증이 극심하면 응급실에서 통증 치료를 받아도 돼요."]);
+   if(child)depts.push(["소아청소년과","만 12세 미만은 소아청소년과 진료가 기본이에요."]);
+   if(hh("preg"))depts.push(["산부인과","임신·산후 중에는 약을 고르기 전에 상담하세요."]);
+  }else{
+   depts.push(["지금은 병원에 꼭 가지 않아도 될 가능성이 높아요","위험 신호가 없고 평소 두통과 비슷하며 통증이 심하지 않을 때 해당돼요. 아래 관리법을 쓰면서 경과를 지켜보세요."]);
+  }
+  const seen=new Set(depts.map(d=>d[0]));
+  r.cand.filter(x=>x.pct>=45&&x.def.dept).slice(0,2).forEach(x=>{if(!seen.has(x.def.dept[0])){seen.add(x.def.dept[0]);depts.push(x.def.dept)}});
+  tests.push("위험 신호가 없는 전형적인 편두통·긴장형 두통은 보통 CT·MRI 없이 문진과 진찰로 진단해요. 영상검사가 꼭 필요한 것은 아니에요.");
+  if(L==="clinic")tests.push("두통 일기: 8주 동안 날짜, 지속 시간, 강도, 동반 증상, 복용한 약, 유발 요인을 기록하면 진단에 큰 도움이 돼요.");
+  if(L==="clinic")tests.push("혈압 측정과 신경학적 진찰");
+  if(L==="clinic"&&a.meds==="m10")tests.push("진통제 사용 일수 점검: 약물과용두통 여부 확인");
+  if(L==="clinic"&&a.compare!=="same")tests.push("의사가 필요하다고 판단하면 뇌 MRI");
+ }
+ if(L==="self"||L==="clinic"){
+  care.push("어둡고 조용한 곳에서 쉬고, 물을 충분히 마시세요.");
+  care.push("잠자는 시간과 식사 시간을 일정하게 하고, 카페인은 줄이세요.");
+  r.cand.filter(x=>x.pct>=40&&x.def.care).slice(0,2).forEach(x=>care.push(x.def.care));
+  care.push("진통제를 쓸 때는 평소 먹던 일반 진통제를 제품 설명서의 용량 안에서만 쓰고, 월 10일을 넘기지 않도록 하세요. 약이 맞는지 모르겠다면 약사에게 물어보세요.");
+  if(hh("preg"))care.push("임신·수유 중에는 어떤 약도 임의로 먹지 말고 의사나 약사와 상의하세요.");
+  care.push("두통 일기를 써 두면 나중에 진료받을 때 도움이 돼요 (아래 '기록에 저장').");
+ }
+ return{depts,tests,care};
+}
+const WATCH=[
+ "갑자기 벼락 치듯 시작되거나 평생 가장 심한 두통",
+ "열과 목 뻣뻣함, 또는 번지는 붉은 반점",
+ "마비·저림, 말 어눌함, 시야 이상, 의식이 흐려짐, 경련",
+ "머리를 다친 뒤 구토가 반복되거나 두통이 점점 심해짐",
+ "기침·운동으로 새로 생기는 두통, 누우면 심해지는 두통",
+ "며칠 사이에 점점 심해지거나 평소와 확연히 달라지는 두통"
+];
+
+/* ================= 렌더 ================= */
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+function headIcon(k){
+ const P={
+  one:'<path d="M20 6a14 14 0 0 0 0 28z" style="fill:var(--accent)"/>',
+  both:'<path d="M9.5 10.7A14 14 0 0 0 9.5 29.3Q13.5 20 9.5 10.7z" style="fill:var(--accent)"/><path d="M30.5 10.7A14 14 0 0 1 30.5 29.3Q26.5 20 30.5 10.7z" style="fill:var(--accent)"/>',
+  eye:'<circle cx="26" cy="18" r="9" style="fill:var(--accent);opacity:.22"/><circle cx="26" cy="18" r="4" style="fill:var(--accent)"/>',
+  face:'<ellipse cx="20" cy="13" rx="8.500" ry="4.500" style="fill:var(--accent)"/><ellipse cx="13" cy="25" rx="4.500" ry="3.500" style="fill:var(--accent);opacity:.7"/><ellipse cx="27" cy="25" rx="4.500" ry="3.500" style="fill:var(--accent);opacity:.7"/>',
+  back:'<path d="M7.4 26A14 14 0 0 0 32.6 26z" style="fill:var(--accent)"/>',
+  all:'<circle cx="20" cy="20" r="14" style="fill:var(--accent);opacity:.9"/>'};
+ return '<svg class="hico" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="14" style="fill:var(--card)"/>'+P[k]+'<circle cx="20" cy="20" r="14" style="fill:none;stroke:var(--mute);stroke-width:1.6;opacity:.6"/></svg>';
+}
+function fieldHtml(f){
+ const a=state.a;
+ if(f.type==="range"){
+  const v=a.sev;
+  return`<fieldset><legend>${f.label}</legend><div class="range"><div class="sevout"><b id="sevn">${v}</b><span id="sevt">${sevText(v)}</span></div><input type="range" id="sev" min="0" max="10" step="1" value="${v}" aria-label="통증 단계"><div class="scale"><span>0 없음</span><span>5 중간</span><span>10 최악</span></div></div></fieldset>`;
+ }
+ const t=f.type==="radio"?"radio":"checkbox";
+ const sel=f.type==="radio"?[a[f.id]]:(a[f.id]||[]);
+ return`<fieldset>${f.label?`<legend>${f.label}</legend>`:""}${f.options.map(o=>`<label class="opt${o.ic?" withic":""}"><input type="${t}" name="${f.id}" value="${o.v}"${sel.includes(o.v)?" checked":""}><i class="mark"></i>${o.ic?headIcon(o.ic):""}<span>${o.l}</span></label>`).join("")}</fieldset>`;
+}
+function sevText(v){v=+v;return v===0?"통증 없음":v<=3?"약함":v<=6?"보통 (일상에 지장)":v<=8?"심함":"매우 심함"}
+function stepValid(s){
+ return s.fields.every(f=>f.type==="radio"?!!state.a[f.id]:f.type==="check"?(state.a[f.id]||[]).length>0:true);
+}
+function render(){
+ if(state.view==="log")return renderLog();
+ if(state.step===0)return renderIntro();
+ if(state.step===RESULT)return renderResult();
+ const s=STEPS[state.step-1];
+ app.innerHTML=`<div class="progress"><i style="width:${state.step/STEPS.length*100}%"></i></div>
+ <div class="stepno">${state.step} / ${STEPS.length}</div><h1>${s.title}</h1><p class="desc">${s.desc}</p>
+ ${s.fields.map(fieldHtml).join("")}
+ <div class="nav"><div><button class="btn ghost" id="back" type="button">이전</button><button class="btn primary" id="next" type="button"${stepValid(s)?"":" disabled"}>${state.step===STEPS.length?"결과 보기":"다음"}</button></div></div>`;
+ window.scrollTo(0,0);
+}
+const ART=`<svg class="hero-art" viewBox="0 0 340 168" role="img" aria-label="두통 유형 비교 일러스트">
+ <defs><linearGradient id="hg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style="stop-color:var(--accent2)"/><stop offset="1" style="stop-color:var(--accent)"/></linearGradient></defs>
+ <circle cx="238" cy="84" r="76" style="fill:var(--accent);opacity:.09"/>
+ <circle cx="238" cy="84" r="54" style="fill:var(--accent);opacity:.11"/>
+ <circle cx="238" cy="84" r="38" style="fill:url(#hg)"/>
+ <path d="M214 86h9l6-14 9 28 7-14h13" style="fill:none;stroke:#fff;stroke-width:3.2;stroke-linecap:round;stroke-linejoin:round"/>
+ <g style="fill:none;stroke:var(--accent);stroke-width:2.4;stroke-linecap:round;opacity:.55"><path d="M277 50q9 6 11 17"/><path d="M285 40q15 9 18 28"/></g>
+ <g>
+  <rect x="8" y="22" width="150" height="38" rx="13" style="fill:var(--card);stroke:var(--line);stroke-width:1.5"/>
+  <text x="22" y="46" style="font:800 13px Pretendard,'Noto Sans KR',sans-serif;fill:var(--ink)">편두통</text>
+  <rect x="78" y="37" width="66" height="8" rx="4" style="fill:var(--line)"/><rect x="78" y="37" width="52" height="8" rx="4" style="fill:var(--accent)"/>
+  <rect x="26" y="66" width="150" height="38" rx="13" style="fill:var(--card);stroke:var(--line);stroke-width:1.5"/>
+  <text x="40" y="90" style="font:800 13px Pretendard,'Noto Sans KR',sans-serif;fill:var(--ink)">부비동</text>
+  <rect x="96" y="81" width="66" height="8" rx="4" style="fill:var(--line)"/><rect x="96" y="81" width="30" height="8" rx="4" style="fill:var(--accent);opacity:.6"/>
+  <rect x="8" y="110" width="150" height="38" rx="13" style="fill:var(--card);stroke:var(--line);stroke-width:1.5"/>
+  <text x="22" y="134" style="font:800 13px Pretendard,'Noto Sans KR',sans-serif;fill:var(--ink)">턱·치아</text>
+  <rect x="78" y="125" width="66" height="8" rx="4" style="fill:var(--line)"/><rect x="78" y="125" width="14" height="8" rx="4" style="fill:var(--accent);opacity:.4"/>
+ </g>
+</svg>`;
+function renderIntro(){
+ app.innerHTML=`<section class="hero"><span class="eyebrow">약 3분이면 끝나요</span><h1>내 두통,<br><em>어떤 종류일까?</em></h1>
+ <p class="desc">증상과 최근 있었던 일을 알려주면 응급 신호부터 확인하고, 가능성이 높은 두통 유형과 병원·검사·집에서의 관리법을 안내해요.</p>${ART}</section>
+ <div class="feats">
+ <div class="feat"><span class="ic"><svg viewBox="0 0 24 24"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg></span><div><b>응급 신호 먼저 확인</b><small>위험한 두통은 바로 병원으로 안내하고, 왜 위험한지도 쉽게 설명해요</small></div></div>
+ <div class="feat"><span class="ic"><svg viewBox="0 0 24 24"><path d="M3 12h4l2.5-6 4 12 2.5-6h5"/></svg></span><div><b>${TYPE_COUNT}가지 두통 유형 비교</b><small>편두통·긴장형부터 부비동, 목, 눈, 턱·치아 원인까지 살펴봐요</small></div></div>
+ <div class="feat"><span class="ic"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="16" rx="3"/><path d="M8 3v4M16 3v4M4 10h16"/></svg></span><div><b>병원·검사·관리법</b><small>어디에 가야 하는지, 안 가도 되는지까지</small></div></div></div>
+ <div class="note">이 결과는 진단이 아니라 참고 정보예요. 갑자기 벼락 치듯 시작된 극심한 두통, 마비·말 어눌함, 의식 저하, 경련이 있다면 바로 119에 전화하세요.</div>
+ <div class="nav"><div><button class="btn primary" id="start" type="button">시작하기</button></div></div>`;
+ window.scrollTo(0,0);
+}
+
+function summaryText(a,r){
+ const LV={emergency:"즉시 응급 진료 권장",urgent:"오늘 안에 진료 권장",clinic:"가까운 시일 내 외래 진료 권장",self:"자가 관리 후 경과 관찰"};
+ const j=k=>(a[k]||[]).filter(x=>x!=="none").map(x=>lab(k,x));
+ const lines=["[두통 체크 요약] "+new Date().toLocaleString("ko-KR"),
+ "판정: "+LV[r.level],
+ "나이대: "+lab("age",a.age),
+ "시작: "+lab("onset",a.onset)+" / 기간: "+lab("since",a.since)+" / 이전과 비교: "+lab("compare",a.compare),
+ "빈도: "+lab("freq",a.freq)+" / 진통제: "+lab("meds",a.meds),
+ "통증: "+a.sev+"/10, "+lab("loc",a.loc)+", "+lab("quality",a.quality)+", 지속 "+lab("dur",a.dur)+", "+lab("act",a.act),
+ "동반 증상: "+(j("sym").join(", ")||"없음"),
+ "위험 신호: "+((r.R.emergency.concat(r.R.urgent)).map(x=>x.t).join("; ")||"없음"),
+ "상황·특징: "+(j("red").join(", ")||"없음"),
+ "병력·최근 일: "+(j("hist").join(", ")||"없음"),
+ "생활: "+(j("life").join(", ")||"없음"),
+ "가능성 높은 유형: "+(r.cand.filter(x=>x.pct>=30).slice(0,3).map(x=>x.def.name+"("+x.label+")").join(", ")||"뚜렷한 유형 없음")];
+ return lines.join("\n");
+}
+
+function candHtml(x,a){
+ const note=x.key==="migraine"&&(a.life||[]).includes("menstrual")?" 생리 전후에 반복된다면 '월경 편두통'일 수 있어요.":"";
+ return`<div class="rank cand"><div class="row"><span>${x.def.name}<span class="grp">${x.def.grp}</span></span><em class="${x.lv}">${x.label}</em></div><div class="bar"><i style="width:${Math.max(6,x.pct)}%"></i></div><small>${x.def.desc}${note}</small>${x.why.length?`<div class="why"><b>근거</b> ${x.why.map(esc).join(" · ")}</div>`:""}</div>`;
+}
+function causeHtml(r){
+ const list=r.level==="emergency"?r.R.emergency.concat(r.R.urgent):r.level==="urgent"?r.R.urgent:[];
+ const keys=[...new Set(list.map(x=>x.c).filter(Boolean))].slice(0,4);
+ if(!keys.length)return"";
+ const head=r.level==="emergency"?"무슨 뜻인가요? 쉬운 설명":"왜 오늘 진료를 권하나요?";
+ return`<div class="card"><h2>${head}</h2><p class="desc" style="margin:0 0 4px;font-size:14px">선택하신 증상에서 먼저 확인해야 하는 원인이에요.</p>${keys.map(k=>`<div class="cause"><b>${CAUSES[k].n}</b><p>${CAUSES[k].d}</p></div>`).join("")}<p class="reassure">진단이 아니라 '먼저 배제해야 하는 위험한 원인'을 알려드리는 거예요. 검사해 보면 큰 문제가 아닌 경우도 많지만, 놓치면 위험해서 확인이 먼저예요.</p></div>`;
+}
+
+const BICON={"emergency":"<path d=\"M12 9v4M12 17h.01\"/><path d=\"M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z\"/>","urgent":"<circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M12 7v5l3 2\"/>","clinic":"<rect x=\"4\" y=\"5\" width=\"16\" height=\"16\" rx=\"3\"/><path d=\"M8 3v4M16 3v4M4 10h16\"/>","self":"<path d=\"M20 6 9 17l-5-5\"/>"};
+
+const TIPSIC={
+ tooth:'<path d="M12 6.4C10.6 5 8.8 4 7.2 4.4 4.9 5 4 7.4 4.5 9.8c.4 2 1.2 3.2 1.5 5.3.3 2.3.7 5.4 2 5.4 1.4 0 1.2-3.4 2-4.8.5-.8 1.5-.8 2 0 .8 1.4.6 4.8 2 4.8 1.3 0 1.7-3.1 2-5.4.3-2.1 1.1-3.3 1.5-5.3.5-2.4-.4-4.8-2.7-5.4-1.6-.4-3.4.6-4.8 2z"/>',
+ eye:'<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
+ moon:'<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>',
+ cup:'<path d="M4 8h12v6a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5V8z"/><path d="M16 10h2a2.5 2.5 0 0 1 0 5h-2"/><path d="M8 3v2M12 3v2"/>',
+ neck:'<rect x="8" y="3" width="8" height="4" rx="1.5"/><rect x="8" y="9" width="8" height="4" rx="1.5"/><rect x="8" y="15" width="8" height="4" rx="1.5"/>',
+ ice:'<path d="M7 11a5 5 0 0 1 10 0"/><path d="M7 11h10l-5 10z"/>'
+};
+const TIPS=[
+ {ic:"tooth",t:"두통인데 치과에 가야 할 수도 있어요",
+  b:"깊은 충치(치수염)나 사랑니 염증, 이를 악물거나 가는 습관, 턱관절 문제는 관자놀이·뺨·귀 앞쪽으로 퍼지는 두통을 만들 수 있어요. 찬 것에 이가 시리거나, 씹을 때 턱이 뻐근하거나, 입을 벌릴 때 소리가 나거나, 아침에 턱이 피곤하다면 치과나 구강내과가 먼저일 수 있어요.",
+  warn:"단, 50세 이상인데 관자놀이를 만지면 아프고 씹을 때 턱이 아프다면 치과보다 먼저 진료를 받으세요 (측두동맥염 가능성). 열이 나고 얼굴이 붓는다면 바로 병원에 가세요.",
+  rel:a=>(a.red||[]).some(x=>x==="jaw"||x==="tooth")},
+ {ic:"eye",t:"눈이 원인일 수도 있어요",
+  b:"안경·렌즈 도수가 맞지 않거나 화면을 오래 보면 눈이 피로해져 이마와 눈 주위가 아플 수 있어요. 도수를 맞추면 나아지는 경우가 있으니 안과에서 시력 검사를 받아 보세요. 20분마다 20초씩 6m 이상 먼 곳을 보는 습관도 도움이 돼요.",
+  rel:a=>(a.red||[]).includes("eyestrain")||(a.life||[]).includes("screen")},
+ {ic:"moon",t:"아침마다 머리가 무겁다면 코골이를 의심해 보세요",
+  b:"수면무호흡이 있으면 자는 동안 숨이 자주 멈추고 산소가 떨어져 아침에 머리가 무겁거나 아픈 두통이 생길 수 있어요. 크게 코를 골고 낮에 자꾸 졸리다면 수면클리닉, 이비인후과, 호흡기내과 상담이 도움이 돼요.",
+  rel:a=>(a.red||[]).includes("osa")},
+ {ic:"neck",t:"목에서 시작되는 두통도 있어요",
+  b:"거북목이나 목 근육·관절 문제 때문에 뒤통수에서 이마 쪽으로 퍼지는 두통이 생길 수 있어요(경추성 두통). 목을 돌리거나 특정 자세에서 심해진다면 정형외과나 재활의학과에서 목 상태를 확인해 보세요.",
+  rel:a=>(a.sym||[]).includes("neckmusc")||a.loc==="back"},
+ {ic:"cup",t:"커피를 줄여도 두통이 와요",
+  b:"매일 마시던 커피·에너지드링크를 갑자기 줄이거나 거르면 하루 안에 두통이 생길 수 있어요(카페인 금단 두통). 주말에만 두통이 온다면 평일보다 늦잠을 자거나 커피를 걸렀는지 떠올려 보세요. 줄일 때는 며칠에 걸쳐 천천히 줄이는 게 좋아요.",
+  rel:a=>(a.life||[]).includes("caffeine")},
+ {ic:"ice",t:"찬 걸 먹을 때 머리가 띵한 건 걱정하지 않아도 돼요",
+  b:"아이스크림이나 찬 음료가 입천장에 닿으면 짧게 머리가 찌르듯 아플 수 있어요. 보통 수 초에서 몇 분 안에 사라지고 위험하지 않아요."}
+];
+function tipsHtml(a){
+ const items=TIPS.map((x,i)=>({x,i,rel:x.rel?!!x.rel(a):false})).sort((p,q)=>(q.rel-p.rel)||(p.i-q.i));
+ const row=o=>`<div class="tip${o.rel?" rel":""}"><span class="ic"><svg viewBox="0 0 24 24">${TIPSIC[o.x.ic]}</svg></span><div><b>${o.x.t}</b>${o.rel?'<span class="badge">지금 해당될 수 있어요</span>':""}<p>${o.x.b}</p>${o.x.warn?`<p class="warn">${o.x.warn}</p>`:""}</div></div>`;
+ const first=items.slice(0,3).map(row).join(""),rest=items.slice(3).map(row).join("");
+ return `<div class="card tips"><h2>혹시 이것도 알고 계셨나요?</h2><p class="desc" style="margin:0 0 4px;font-size:14px">두통의 원인이 머리 밖에 있는 경우도 꽤 있어요.</p>${first}${rest?`<details><summary>더 보기 (${items.length-3})</summary>${rest}</details>`:""}</div>`;
+}
+
+function renderResult(){
+ const a=state.a,r=evaluate(a),p=plan(a,r);state.r=r;
+ const H={
+  emergency:["지금 바로 응급 진료가 필요할 수 있어요","119에 전화하거나 가까운 응급실로 가세요. 직접 운전하지 마세요."],
+  urgent:["오늘 안에 진료를 받아보세요","가능하면 오늘 중 응급실 또는 당일 진료가 되는 병원에 가세요. 증상이 심해지면 바로 응급실로 가세요."],
+  clinic:["가까운 시일 내 외래 진료를 권해요","며칠~2주 안에 신경과(또는 가정의학과) 진료를 예약해 두세요."],
+  self:["지금은 집에서 관리하며 지켜봐도 될 가능성이 높아요","위험 신호가 보이지 않아요. 아래 관리법을 따르고, 하단의 경우가 생기면 병원에 가세요."]
+ }[r.level];
+ const T=k=>r.R[k].map(x=>x.t);
+ const why=r.level==="emergency"?T("emergency"):r.level==="urgent"?T("urgent"):r.level==="clinic"?T("clinic"):["응급·긴급 위험 신호가 선택되지 않았어요","평소 겪던 두통과 비슷하고 통증이 심하지 않아요"];
+ const extra=r.level==="emergency"?T("urgent"):r.level==="urgent"?T("clinic"):[];
+ const shown=r.cand.filter(x=>x.pct>=30).slice(0,3);
+ const others=r.cand.filter(x=>!shown.includes(x)&&x.pct>=15).slice(0,4);
+ const topLine=shown.length&&shown[0].pct>=40?`입력하신 증상은 <b>${shown[0].def.name}</b> 쪽 특징과 가장 많이 겹쳐요.`:"입력하신 증상이 어느 한 유형에 뚜렷하게 맞지 않아요. 정보가 부족하거나 여러 요인이 섞였을 수 있어요.";
+ const rankCard=`<div class="card"><h2>가능성이 높은 두통 유형</h2><p class="desc" style="margin:0 0 6px">${topLine} 아래는 확률이 아니라, 입력한 증상이 각 유형의 대표 특징(ICHD-3, NICE 기준)과 얼마나 겹치는지를 나타내요.</p>${shown.map(x=>candHtml(x,a)).join("")}${others.length?`<details><summary>그 밖의 가능성 보기 (${others.length})</summary>${others.map(x=>`<div class="rank"><div class="row"><span>${x.def.name}<span class="grp">${x.def.grp}</span></span><em class="lo">${x.label}</em></div><small>${x.def.desc}</small></div>`).join("")}</details>`:""}${a.meds==="m10"?`<p><span class="tag">주의</span>진통제를 월 10일 이상 쓰면 약물과용두통이 생길 수 있어요. 임의로 갑자기 끊기보다 의사와 조절 계획을 세우세요.</p>`:""}<p style="margin:8px 0 0;color:var(--mute);font-size:14px">이차성 두통(다른 원인 때문에 생긴 두통) 가능성: <b>${r.level==="emergency"?"먼저 배제해야 함":r.level==="urgent"?"확인이 필요함":"뚜렷한 위험 신호 없음"}</b></p></div>`;
+ app.innerHTML=`<div class="banner ${r.level}"><span class="bico"><svg viewBox="0 0 24 24">${BICON[r.level]}</svg></span><div class="btxt"><h1>${H[0]}</h1><p>${H[1]}</p>${r.level==="emergency"?`<div class="call"><a class="btn primary" style="background:var(--red);border-color:var(--red);color:#fff" href="tel:119">119에 전화하기</a></div>`:""}</div></div>
+ <div class="card"><h2>이렇게 판단한 이유</h2><ul>${why.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>${extra.length?`<p style="margin:10px 0 0;color:var(--mute);font-size:14px">함께 확인된 사항</p><ul>${extra.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`:""}</div>
+ ${causeHtml(r)}
+ ${r.level==="emergency"?`<details><summary>참고: 가능성이 높은 두통 유형</summary>${rankCard}</details>`:rankCard}
+ <div class="card"><h2>어디로 가야 하나요?</h2>${p.depts.map(d=>`<p style="margin:8px 0 0"><b>${d[0]}</b><br><span style="color:var(--mute)">${d[1]}</span></p>`).join("")}</div>
+ <div class="card"><h2>${r.level==="self"?"병원에 가게 되면 알아둘 점":"병원에서 받을 수 있는 검사"}</h2><p class="desc" style="margin:0 0 4px;font-size:14px">검사는 의사가 증상과 진찰 결과를 보고 정해요. 스스로 요구하기보다 아래 내용을 참고해 상담하세요.</p><ul>${p.tests.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>
+ <div class="card"><h2>${r.level==="emergency"||r.level==="urgent"?"가기 전에 해두면 좋은 일":"집에서 할 수 있는 관리"}</h2><ul>${p.care.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>
+ ${r.level==="emergency"?"":`<div class="card red"><h2>이런 일이 생기면 바로 응급실</h2><ul>${WATCH.map(x=>`<li>${x}</li>`).join("")}</ul></div>`}
+ ${r.level==="emergency"?"":tipsHtml(a)}
+ <div class="actions"><button class="btn primary sm" id="copy" type="button">의사에게 보여줄 요약 복사</button><button class="btn ghost sm" id="save" type="button">기록에 저장</button><button class="btn ghost sm" id="redo" type="button">처음부터 다시</button></div>
+ <p class="disc">이 결과는 입력한 정보만으로 만든 참고 자료이며 진단이 아닙니다. 증상이 걱정되거나 입력한 것과 다르게 악화되면 결과와 상관없이 의료진에게 진료를 받으세요.</p>
+ <div class="nav"><div><button class="btn ghost" id="back" type="button">답 고치기</button></div></div>`;
+ window.scrollTo(0,0);
+}
+
+/* ================= 기록 ================= */
+const KEY="headache-check-log-v1";
+function getLog(){try{return JSON.parse(localStorage.getItem(KEY)||"[]")}catch(e){return[]}}
+function setLog(v){try{localStorage.setItem(KEY,JSON.stringify(v));return true}catch(e){return false}}
+function renderLog(){
+ const log=getLog();
+ const NAME={emergency:"응급",urgent:"오늘 진료",clinic:"외래 권장",self:"자가 관리"};
+ app.innerHTML=`<h1>내 기록</h1><p class="desc">이 기기의 브라우저에만 저장돼요. 8주 정도 모으면 진료받을 때 큰 도움이 돼요.</p>
+ ${log.length?log.slice().reverse().map((e,i)=>`<div class="card log"><div><b>${esc(e.date)}</b><span class="tag">${NAME[e.level]}</span><span class="tag">통증 ${e.sev}/10</span><br><span style="color:var(--mute);font-size:14px">${esc(e.top)} 특징 일치 · ${esc(e.sym||"동반 증상 없음")}</span></div><button class="link" data-del="${log.length-1-i}" type="button">삭제</button></div>`).join(""):`<div class="card">저장된 기록이 없어요.</div>`}
+ <div class="actions"><button class="btn primary sm" id="closeLog" type="button">돌아가기</button>${log.length?`<button class="btn ghost sm" id="clearLog" type="button">전체 삭제</button>`:""}</div>`;
+ window.scrollTo(0,0);
+}
+function toast(msg){const t=document.createElement("div");t.className="toast";t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),1800)}
+
+/* ================= 이벤트 ================= */
+function syncChecks(name){
+ document.querySelectorAll(`input[name="${name}"]`).forEach(i=>{i.checked=(state.a[name]||[]).includes(i.value)});
+}
+app.addEventListener("change",e=>{
+ const t=e.target;if(!t.name)return;
+ const f=STEPS.flatMap(s=>s.fields).find(x=>x.id===t.name);if(!f)return;
+ if(f.type==="radio")state.a[t.name]=t.value;
+ else{
+  let cur=(state.a[t.name]||[]).slice();
+  const o=f.options.find(x=>x.v===t.value);
+  if(t.checked){
+   if(o&&o.exclusive)cur=[t.value];
+   else{cur=cur.filter(x=>{const oo=f.options.find(y=>y.v===x);return !(oo&&oo.exclusive)});cur.push(t.value)}
+  }else cur=cur.filter(x=>x!==t.value);
+  state.a[t.name]=cur;syncChecks(t.name);
+ }
+ const nx=document.getElementById("next");
+ if(nx&&state.step>0&&state.step<RESULT)nx.disabled=!stepValid(STEPS[state.step-1]);
+});
+app.addEventListener("input",e=>{
+ if(e.target.id==="sev"){state.a.sev=+e.target.value;document.getElementById("sevn").textContent=e.target.value;document.getElementById("sevt").textContent=sevText(e.target.value)}
+});
+app.addEventListener("click",e=>{
+ const b=e.target.closest("button");if(!b)return;
+ if(b.id==="start"){state.step=1;render()}
+ else if(b.id==="next"){
+  if(state.step===1&&(state.a.em||[]).some(x=>x!=="none")){state.step=RESULT}
+  else state.step=Math.min(state.step+1,RESULT);
+  render();
+ }
+ else if(b.id==="back"){
+  if(state.step===RESULT&&(state.a.em||[]).some(x=>x!=="none")&&!state.a.age)state.step=1;
+  else state.step=Math.max(state.step-1,0);
+  render();
+ }
+ else if(b.id==="redo"){state.step=0;state.a={sev:5};render()}
+ else if(b.id==="copy"){
+  const txt=summaryText(state.a,state.r);
+  (navigator.clipboard?navigator.clipboard.writeText(txt):Promise.reject()).then(()=>toast("요약을 복사했어요")).catch(()=>{
+   const ta=document.createElement("textarea");ta.value=txt;document.body.appendChild(ta);ta.select();
+   try{document.execCommand("copy");toast("요약을 복사했어요")}catch(_){toast("복사에 실패했어요")}ta.remove();
+  });
+ }
+ else if(b.id==="save"){
+  const a=state.a,r=state.r,log=getLog();
+  log.push({date:new Date().toLocaleString("ko-KR"),level:r.level,sev:a.sev,top:r.top.def.name,sym:(a.sym||[]).filter(x=>x!=="none").map(x=>lab("sym",x).split(" ")[0]).slice(0,3).join(", ")});
+  toast(setLog(log)?"기록에 저장했어요":"저장할 수 없어요 (브라우저 설정 확인)");
+ }
+ else if(b.id==="closeLog"){state.view="wizard";render()}
+ else if(b.id==="clearLog"){if(confirm("기록을 모두 삭제할까요?")){setLog([]);renderLog()}}
+ else if(b.dataset.del!==undefined){const log=getLog();log.splice(+b.dataset.del,1);setLog(log);renderLog()}
+});
+document.getElementById("btnLog").addEventListener("click",()=>{state.view=state.view==="log"?"wizard":"log";render()});
+render();
+</script>
+</body>
+</html>
